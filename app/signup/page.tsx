@@ -10,7 +10,6 @@ const signupSchema = z.object({
   username: z.string().min(1, "Username is required"),
   email: z.string().email("Invalid email"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
-  country: z.string().optional(),
 });
 
 type SignupFormData = z.infer<typeof signupSchema>;
@@ -33,7 +32,7 @@ export default function Signup() {
       setErrorMessage("");
       
       // Connect to your API endpoint
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch("http://localhost:4567/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -116,15 +115,6 @@ export default function Signup() {
             />
             {errors.password && <p className="text-red-600 font-medium mt-1">{errors.password.message}</p>}
           </div>
-
-          <div>
-            <label className="block text-lg font-medium text-black mb-1">Country (Optional)</label>
-            <input 
-              {...register("country")} 
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-md text-black bg-white" 
-            />
-          </div>
-
           <button 
             type="submit" 
             disabled={isSubmitting} 
