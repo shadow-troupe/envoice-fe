@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4567"
 // Define schema based on your UserSignUpDto
 const signupSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -32,7 +33,7 @@ export default function Signup() {
       setErrorMessage("");
       
       // Connect to your API endpoint
-      const response = await fetch("http://localhost:4567/auth/register", {
+      const response = await fetch(`${base_url}auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

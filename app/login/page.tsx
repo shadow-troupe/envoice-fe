@@ -6,6 +6,7 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4567"
 // Define schema for login form
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -42,7 +43,7 @@ export default function Login() {
       setErrorMessage("");
       
       // Connect to your API endpoint
-      const response = await fetch("http://localhost:4567/auth/login", {
+      const response = await fetch(`${base_url}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
