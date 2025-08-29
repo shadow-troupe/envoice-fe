@@ -23,6 +23,7 @@ export const isTokenExpired = (token: string): boolean => {
 };
 
 // Function to refresh the access token
+// Function to refresh the access token
 export const refreshAccessToken = async (): Promise<string | null> => {
   try {
     const refreshToken = localStorage.getItem("refreshToken");
@@ -31,7 +32,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
       return null;
     }
     
-    const response = await fetch("http://localhost:4567/auth/refresh", {
+    const response = await fetch("http://localhost:4567/auth/refresh-token", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,11 +46,8 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     
     const data = await response.json();
     
-    // Update the stored tokens
+    // Update the stored access token only
     localStorage.setItem("accessToken", data.accessToken);
-    if (data.refreshToken) {
-      localStorage.setItem("refreshToken", data.refreshToken);
-    }
     
     return data.accessToken;
   } catch (error) {
@@ -57,6 +55,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     return null;
   }
 };
+
 
 // Function to get the current access token, refreshing if needed
 export const getAccessToken = async (): Promise<string | null> => {
