@@ -11,6 +11,7 @@ interface Client {
   name: string;
   email: string;
   phone: string;
+  address:string;
 }
 
 export default function ClientPage() {
@@ -22,6 +23,7 @@ export default function ClientPage() {
     name: "",
     email: "",
     phone: "",
+    address: "",
   });
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function ClientPage() {
   const fetchClients = async () => {
     try {
       const token = localStorage.getItem("accessToken");
+      console.log(token)
       const res = await fetch(`${base_url}/clients`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -66,7 +69,7 @@ export default function ClientPage() {
     if (res.ok) {
       await fetchClients();
       setEditing(null);
-      setForm({ name: "", email: "", phone: "" });
+      setForm({ name: "", email: "", phone: "", address: "" });
     }
   };
 
@@ -138,6 +141,18 @@ export default function ClientPage() {
                 required
               />
             </div>
+            <div>
+              <label className="block font-medium mb-1 text-gray-900">
+                Address
+              </label>
+              <input
+                type="text"
+                value={form.address}
+                onChange={(e) => setForm({ ...form, address: e.target.value })}
+                className="w-full border rounded p-2 text-gray-900"
+                required
+              />
+            </div>
             <div className="flex gap-2">
               <button
                 type="submit"
@@ -150,7 +165,7 @@ export default function ClientPage() {
                   type="button"
                   onClick={() => {
                     setEditing(null);
-                    setForm({ name: "", email: "", phone: "" });
+                    setForm({ name: "", email: "", phone: "", address: "" });
                   }}
                   className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
                 >
@@ -178,6 +193,9 @@ export default function ClientPage() {
                     <p className="text-gray-900">
                       <strong>Phone:</strong> {client.phone}
                     </p>
+                    <p className="text-gray-900">
+                      <strong>Address:</strong> {client.address}
+                    </p>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -187,6 +205,7 @@ export default function ClientPage() {
                           name: client.name,
                           email: client.email,
                           phone: client.phone,
+                          address:client.address
                         });
                       }}
                       className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
