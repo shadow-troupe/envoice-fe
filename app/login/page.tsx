@@ -21,7 +21,7 @@ import {
   ArrowRight
 } from "lucide-react";
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 // Define schema for login form
 const loginSchema = z.object({

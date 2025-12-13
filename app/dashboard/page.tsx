@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { User, Mail, Phone, MapPin, Calendar, Upload, Save, Edit2, X, CheckCircle, Globe, Camera } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 interface UserProfile {
   _id?: string;
@@ -55,80 +55,102 @@ export default function ProfilePage() {
   }, [authLoading, accessToken]);
 
   const fetchUserProfile = async () => {
-    try {
-      console.log("Fetching user profile with token:", accessToken ? "Token exists" : "No token");
-      
-      if (!accessToken) {
-        console.error("No access token available");
-        setLoading(false);
-        return;
-      }
+  try {
+    console.log(
+      "Fetching current user with token:",
+      accessToken ? "Token exists" : "No token"
+    );
 
-      const res = await fetch(`${base_url}/users/me`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      console.log(`/users/me response status: ${res.status}`);
-
-      if (res.status === 401) {
-        console.error("Token is invalid or expired. Redirecting to login...");
-        // Clear invalid auth and redirect to login
-        clearAuth();
-        window.location.href = '/login';
-        return;
-      }
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("API Error:", errorText);
-        throw new Error("Failed to fetch user");
-      }
-
-      const json = await res.json();
-      
-      
-      // Handle different response structures
-      const userData = json.data || json.user || json;
-   
-      
-      // Map all fields directly without converting undefined values
-      const userProfile: UserProfile = {
-        _id: userData._id,
-        id: userData._id || userData.id,
-        email: userData.email,
-        username: userData.username,
-        mobile: userData.mobile,
-        first_name: userData.first_name,
-        last_name: userData.last_name,
-        imageUrl: userData.imageUrl,
-        gender: userData.gender,
-        country: userData.country,
-        lastLogin: userData.lastLogin,
-        emailVerified: userData.emailVerified === true, // Strict boolean check
-        createdAt: userData.createdAt,
-        updatedAt: userData.updatedAt,
-      };
-    
-      setUser(userProfile);
-      
-      // Initialize form with current user data
-      setForm({
-        username: userData.username || "",
-        first_name: userData.first_name || "",
-        last_name: userData.last_name || "",
-        mobile: userData.mobile || "",
-        gender: userData.gender || "",
-        country: userData.country || "",
-        imageFile: null,
-      });
-    } catch (error) {
-      console.error("Error fetching user:", error);
-    } finally {
+    if (!accessToken) {
       setLoading(false);
+      return;
     }
-  };
+
+    // 1️⃣ Fetch current authenticated user (to get their ID)
+    const meRes = await fetch(`${base_url}/users/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (meRes.status === 401) {
+      clearAuth();
+      window.location.href = "/login";
+      return;
+    }
+
+    if (!meRes.ok) {
+      throw new Error("Failed to fetch current user");
+    }
+
+    const meJson = await meRes.json();
+    const meData = meJson.data || meJson.user || meJson;
+    const userId = meData._id || meData.id;
+
+    if (!userId) {
+      throw new Error("User ID not found in /users/me response");
+    }
+
+    console.log("Current user ID:", userId);
+
+    // 2️⃣ Fetch full user profile by ID
+    const userRes = await fetch(`${base_url}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (userRes.status === 401) {
+      clearAuth();
+      window.location.href = "/login";
+      return;
+    }
+
+    if (!userRes.ok) {
+      throw new Error("Failed to fetch full user profile");
+    }
+
+    const userJson = await userRes.json();
+    const userData = userJson.data || userJson.user || userJson;
+    console.log("Fetched full user data:", userData);
+
+    const userProfile: UserProfile = {
+      _id: userData._id,
+      id: userData._id || userData.id,
+      email: userData.email,
+      username: userData.username,
+      mobile: userData.mobile,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      imageUrl: userData.imageUrl,
+      gender: userData.gender,
+      country: userData.country,
+      lastLogin: userData.lastLogin,
+      emailVerified: userData.emailVerified === true,
+      createdAt: userData.createdAt,
+      updatedAt: userData.updatedAt,
+    };
+
+    setUser(userProfile);
+
+    // Initialize form
+    setForm({
+      username: userData.username || "",
+      first_name: userData.first_name || "",
+      last_name: userData.last_name || "",
+      mobile: userData.mobile || "",
+      gender: userData.gender || "",
+      country: userData.country || "",
+      imageFile: null,
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    setErrorMessage(error instanceof Error ? error.message : "Unknown error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,92 +164,54 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setErrorMessage("");
+ const handleSubmit = async (e:React.FormEvent) => {
+  e.preventDefault();
+  setSaving(true);
+  setErrorMessage("");
 
-    try {
-      // Try different endpoint patterns your backend might use
-      const endpoints = [
-        `${base_url}/users/profile/update`,
-        `${base_url}/users/me/update`,
-        `${base_url}/users/${user?._id}`,
-        `${base_url}/users/update`,
-      ];
+  try {
+    const formData = new FormData();
 
-      let success = false;
-      let lastError = null;
-
-      // Try JSON body first
-      const jsonBody = {
-        username: form.username,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        mobile: form.mobile,
-        gender: form.gender,
-        country: form.country,
-      };
-
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Trying endpoint: ${endpoint}`);
-          
-          const res = await fetch(endpoint, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify(jsonBody),
-          });
-
-          console.log(`Response status: ${res.status}`);
-
-          if (res.ok) {
-            success = true;
-            
-            // Handle image upload separately if needed
-            if (form.imageFile) {
-              const formData = new FormData();
-              formData.append("image", form.imageFile);
-              
-              const imageEndpoint = `${base_url}/users/upload-image`;
-              await fetch(imageEndpoint, {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                },
-                body: formData,
-              });
-            }
-            
-            await fetchUserProfile();
-            setEditing(false);
-            setImagePreview(null);
-            setSuccessMessage("Profile updated successfully!");
-            setTimeout(() => setSuccessMessage(""), 3000);
-            break;
-          } else {
-            const errorData = await res.json().catch(() => ({ message: res.statusText }));
-            lastError = errorData.message || `Failed with status ${res.status}`;
-          }
-        } catch (err: any) {
-          console.error(`Error with ${endpoint}:`, err);
-          lastError = err.message;
-        }
-      }
-
-      if (!success) {
-        throw new Error(lastError || "All update endpoints failed. Please check your backend API documentation.");
-      }
-    } catch (error: any) {
-      console.error("Update error:", error);
-      setErrorMessage(error.message || "Failed to update profile");
-    } finally {
-      setSaving(false);
+    // Attach file if selected
+    if (form.imageFile) {
+      formData.append("file", form.imageFile); // MUST be "file"
     }
-  };
+
+    // Attach text fields
+    formData.append("username", form.username || "");
+    formData.append("first_name", form.first_name || "");
+    formData.append("last_name", form.last_name || "");
+    formData.append("mobile", form.mobile || "");
+    formData.append("gender", form.gender || "");
+    formData.append("country", form.country || "");
+
+    const res = await fetch(`${base_url}/users/me/update`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        // ❌ Never set Content-Type manually here
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}));
+      throw new Error(error.message || "Failed to update profile");
+    }
+
+    await fetchUserProfile();
+    setEditing(false);
+    setImagePreview(null);
+    setSuccessMessage("Profile updated successfully!");
+    setTimeout(() => setSuccessMessage(""), 3000);
+
+  } catch (err:any) {
+    setErrorMessage(err.message || "Something went wrong");
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   if (authLoading || loading) {
     return (

@@ -48,7 +48,6 @@ useEffect(() => {
 
       if (res.status === 401) {
         console.error("Token is invalid or expired. Redirecting to login...");
-        // Clear invalid auth and redirect to login
         clearAuth();
         window.location.href = '/login';
         return;
@@ -56,6 +55,7 @@ useEffect(() => {
 
       if (res.ok) {
         const data = await res.json();
+        console.log("Fetched profile data:", data);
         setProfile(data);
       } else {
         setProfile(null);
