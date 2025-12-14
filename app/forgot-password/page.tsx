@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 export default function ChangePasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();

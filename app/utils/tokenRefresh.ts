@@ -1,6 +1,6 @@
 // utils/tokenRefresh.ts
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 export async function refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; refreshToken: string } | null> {
   try {
     console.log("Attempting to refresh access token...");
