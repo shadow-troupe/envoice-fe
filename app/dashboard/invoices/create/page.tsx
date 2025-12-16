@@ -6,7 +6,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import TemplateSelector from "../../../components/TemplateSelector";
 
-const base_url = process.env.NEXT_PUBLIC_API_URL;
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface InvoiceItem {
   description: string;
@@ -353,7 +353,7 @@ export default function CreateInvoicePage() {
                             Qty
                           </label>
                           <input
-                            type="number"
+                            type="text"
                             placeholder="Qty"
                             value={item.quantity}
                             onChange={(e) => updateItem(i, "quantity", +e.target.value)}
@@ -366,7 +366,7 @@ export default function CreateInvoicePage() {
                             Price
                           </label>
                           <input
-                            type="number"
+                            type="text"
                             placeholder="Price"
                             value={item.unitPrice}
                             onChange={(e) => updateItem(i, "unitPrice", +e.target.value)}
@@ -379,7 +379,7 @@ export default function CreateInvoicePage() {
                             Disc
                           </label>
                           <input
-                            type="number"
+                            type="text"
                             placeholder="Disc."
                             value={item.discount || 0}
                             onChange={(e) => updateItem(i, "discount", +e.target.value)}
@@ -416,7 +416,7 @@ export default function CreateInvoicePage() {
                           Quantity
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           placeholder="Qty"
                           value={item.quantity}
                           onChange={(e) => updateItem(i, "quantity", +e.target.value)}
@@ -429,7 +429,7 @@ export default function CreateInvoicePage() {
                           Unit Price
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           placeholder="Price"
                           value={item.unitPrice}
                           onChange={(e) => updateItem(i, "unitPrice", +e.target.value)}

@@ -5,7 +5,7 @@ import { Pencil, Trash2, Building2, MapPin, Phone, Upload, X, CheckCircle, Loade
 import { useAuth } from "../../context/AuthContext";
 
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 interface BusinessProfile {
   name: string;

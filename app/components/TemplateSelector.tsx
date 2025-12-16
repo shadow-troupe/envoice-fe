@@ -43,11 +43,11 @@ export default function TemplateSelector({
 
   const fetchTemplates = async () => {
     try {
-      console.log("🔍 Fetching templates from:", `${process.env.NEXT_PUBLIC_API_URL}/invoices/templates`);
+      console.log("🔍 Fetching templates from:", `${process.env.NEXT_PUBLIC_API_BASE_URL}/invoices/templates`);
       console.log("🔑 Token exists:", !!accessToken);
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/invoices/templates`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/invoices/templates`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`, // ✅ USE TOKEN FROM CONTEXT
@@ -91,7 +91,7 @@ export default function TemplateSelector({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/invoices/templates/${templateId}/preview`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/invoices/templates/${templateId}/preview`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`, // ✅ USE TOKEN FROM CONTEXT
@@ -124,37 +124,37 @@ export default function TemplateSelector({
   };
 
   const getColorClasses = (colorScheme: string) => {
-    switch (colorScheme) {
-      case "indigo-purple":
-        return {
-          bg: "bg-gradient-to-br from-indigo-500 to-purple-600",
-          border: "border-indigo-600",
-          text: "text-indigo-600",
-          hover: "hover:border-indigo-500",
-        };
-      case "amber-gold":
-        return {
-          bg: "bg-gradient-to-br from-amber-400 to-orange-500",
-          border: "border-amber-600",
-          text: "text-amber-600",
-          hover: "hover:border-amber-500",
-        };
-      case "pink-rose":
-        return {
-          bg: "bg-gradient-to-br from-pink-500 to-rose-600",
-          border: "border-pink-600",
-          text: "text-pink-600",
-          hover: "hover:border-pink-500",
-        };
-      default:
-        return {
-          bg: "bg-gradient-to-br from-gray-400 to-gray-600",
-          border: "border-gray-600",
-          text: "text-gray-600",
-          hover: "hover:border-gray-500",
-        };
-    }
-  };
+  switch (colorScheme) {
+    case "cyan-blue":
+      return {
+        bg: "bg-gradient-to-br from-cyan-400 to-blue-600",
+        border: "border-cyan-600",
+        text: "text-cyan-600",
+        hover: "hover:border-cyan-500",
+      };
+    case "red-maroon":
+      return {
+        bg: "bg-gradient-to-br from-red-600 to-red-800",
+        border: "border-red-700",
+        text: "text-red-700",
+        hover: "hover:border-red-600",
+      };
+    case "indigo-purple": // Keep for existing Modern template
+      return {
+        bg: "bg-gradient-to-br from-indigo-500 to-purple-600",
+        border: "border-indigo-600",
+        text: "text-indigo-600",
+        hover: "hover:border-indigo-500",
+      };
+    default:
+      return {
+        bg: "bg-gradient-to-br from-gray-400 to-gray-600",
+        border: "border-gray-600",
+        text: "text-gray-600",
+        hover: "hover:border-gray-500",
+      };
+  }
+};
 
   if (loading) {
     return (
@@ -185,7 +185,7 @@ export default function TemplateSelector({
         </div>
         <div className="mt-4 p-3 bg-white rounded border border-red-200">
           <p className="text-xs text-gray-600 font-mono">
-            API URL: {process.env.NEXT_PUBLIC_API_URL}/invoices/templates
+            API URL: {process.env.NEXT_PUBLIC_API_BASE_URL}/invoices/templates
           </p>
           <p className="text-xs text-gray-600 font-mono mt-1">
             Token: {accessToken ? "✓ Present" : "✗ Missing"}

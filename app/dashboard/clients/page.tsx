@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
 
-const base_url = process.env.NEXT_PUBLIC_API_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
 
 interface Client {
   id: string;

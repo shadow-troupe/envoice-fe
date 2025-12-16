@@ -32,8 +32,8 @@ export default function ProfilePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
-  
+  const [imageKey, setImageKey] = useState(Date.now()); // ✅ Cache busting
+
   const [form, setForm] = useState({
     username: "",
     first_name: "",
@@ -41,122 +41,123 @@ export default function ProfilePage() {
     mobile: "",
     gender: "",
     country: "",
-    imageUrl: null as File | null,
+    imageFile: null as File | null,
   });
 
+  // ✅ Cache-busting helper function
+  const getImageUrl = (url?: string) => {
+    if (!url) return undefined;
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}t=${imageKey}`;
+  };
+
   useEffect(() => {
-    // Wait for AuthContext to finish loading before fetching
     if (!authLoading && accessToken) {
       fetchUserProfile();
     } else if (!authLoading && !accessToken) {
-      // Auth finished loading but no token found
       console.log("No token after auth loading complete, redirecting to login");
       window.location.href = '/login';
     }
   }, [authLoading, accessToken]);
 
   const fetchUserProfile = async () => {
-  try {
-    console.log(
-      "Fetching current user with token:",
-      accessToken ? "Token exists" : "No token"
-    );
+    try {
+      console.log(
+        "Fetching current user with token:",
+        accessToken ? "Token exists" : "No token"
+      );
 
-    if (!accessToken) {
+      if (!accessToken) {
+        setLoading(false);
+        return;
+      }
+
+      const meRes = await fetch(`${base_url}/users/me`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (meRes.status === 401) {
+        clearAuth();
+        window.location.href = "/login";
+        return;
+      }
+
+      if (!meRes.ok) {
+        throw new Error("Failed to fetch current user");
+      }
+
+      const meJson = await meRes.json();
+      const meData = meJson.data || meJson.user || meJson;
+      const userId = meData._id || meData.id;
+
+      if (!userId) {
+        throw new Error("User ID not found in /users/me response");
+      }
+
+      console.log("Current user ID:", userId);
+
+      const userRes = await fetch(`${base_url}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (userRes.status === 401) {
+        clearAuth();
+        window.location.href = "/login";
+        return;
+      }
+
+      if (!userRes.ok) {
+        throw new Error("Failed to fetch full user profile");
+      }
+
+      const userJson = await userRes.json();
+      const userData = userJson.data || userJson.user || userJson;
+      console.log("Fetched full user data:", userData);
+
+      const userProfile: UserProfile = {
+        _id: userData._id,
+        id: userData._id || userData.id,
+        email: userData.email,
+        username: userData.username,
+        mobile: userData.mobile,
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        imageUrl: userData.imageUrl,
+        gender: userData.gender,
+        country: userData.country,
+        lastLogin: userData.lastLogin,
+        emailVerified: userData.emailVerified === true,
+        createdAt: userData.createdAt,
+        updatedAt: userData.updatedAt,
+      };
+
+      setUser(userProfile);
+
+      setForm({
+        username: userData.username || "",
+        first_name: userData.first_name || "",
+        last_name: userData.last_name || "",
+        mobile: userData.mobile || "",
+        gender: userData.gender || "",
+        country: userData.country || "",
+        imageFile: null,
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Unknown error");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // 1️⃣ Fetch current authenticated user (to get their ID)
-    const meRes = await fetch(`${base_url}/users/me`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (meRes.status === 401) {
-      clearAuth();
-      window.location.href = "/login";
-      return;
-    }
-
-    if (!meRes.ok) {
-      throw new Error("Failed to fetch current user");
-    }
-
-    const meJson = await meRes.json();
-    const meData = meJson.data || meJson.user || meJson;
-    const userId = meData._id || meData.id;
-
-    if (!userId) {
-      throw new Error("User ID not found in /users/me response");
-    }
-
-    console.log("Current user ID:", userId);
-
-    // 2️⃣ Fetch full user profile by ID
-    const userRes = await fetch(`${base_url}/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (userRes.status === 401) {
-      clearAuth();
-      window.location.href = "/login";
-      return;
-    }
-
-    if (!userRes.ok) {
-      throw new Error("Failed to fetch full user profile");
-    }
-
-    const userJson = await userRes.json();
-    const userData = userJson.data || userJson.user || userJson;
-    console.log("Fetched full user data:", userData);
-
-    const userProfile: UserProfile = {
-      _id: userData._id,
-      id: userData._id || userData.id,
-      email: userData.email,
-      username: userData.username,
-      mobile: userData.mobile,
-      first_name: userData.first_name,
-      last_name: userData.last_name,
-      imageUrl: userData.imageUrl,
-      gender: userData.gender,
-      country: userData.country,
-      lastLogin: userData.lastLogin,
-      emailVerified: userData.emailVerified === true,
-      createdAt: userData.createdAt,
-      updatedAt: userData.updatedAt,
-    };
-
-    setUser(userProfile);
-
-    // Initialize form
-    setForm({
-      username: userData.username || "",
-      first_name: userData.first_name || "",
-      last_name: userData.last_name || "",
-      mobile: userData.mobile || "",
-      gender: userData.gender || "",
-      country: userData.country || "",
-      imageUrl: null,
-    });
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    setErrorMessage(error instanceof Error ? error.message : "Unknown error");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setForm({ ...form, imageUrl: file });
+      setForm({ ...form, imageFile: file });
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
@@ -165,88 +166,70 @@ export default function ProfilePage() {
     }
   };
 
- const handleSubmit = async (e:React.FormEvent) => {
-  e.preventDefault();
-  setSaving(true);
-  setErrorMessage("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setErrorMessage("");
 
     try {
-      // Try different endpoint patterns your backend might use
-      const endpoints = [
-        `${base_url}/users/profile/update`,
-        `${base_url}/users/me/update`,
-        `${base_url}/users/${user?._id}`,
-        `${base_url}/users/update`,
-      ];
+      const formData = new FormData();
+      const hasImageUpload = form.imageFile !== null;
 
-      let success = false;
-      let lastError = null;
-
-      // Try JSON body first
-      const jsonBody = {
-        username: form.username,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        mobile: form.mobile,
-        gender: form.gender,
-        country: form.country,
-      };
-
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Trying endpoint: ${endpoint}`);
-          
-          const res = await fetch(endpoint, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify(jsonBody),
-          });
-
-          console.log(`Response status: ${res.status}`);
-
-          if (res.ok) {
-            success = true;
-            
-            // Handle image upload separately if needed
-            if (form.imageFile) {
-              const formData = new FormData();
-              formData.append("image", form.imageFile);
-              
-              const imageEndpoint = `${base_url}/users/upload-image`;
-              await fetch(imageEndpoint, {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                },
-                body: formData,
-              });
-            }
-            
-            await fetchUserProfile();
-            setEditing(false);
-            setImagePreview(null);
-            setSuccessMessage("Profile updated successfully!");
-            setTimeout(() => setSuccessMessage(""), 3000);
-            break;
-          } else {
-            const errorData = await res.json().catch(() => ({ message: res.statusText }));
-            lastError = errorData.message || `Failed with status ${res.status}`;
-          }
-        } catch (err: any) {
-          console.error(`Error with ${endpoint}:`, err);
-          lastError = err.message;
-        }
+      if (form.imageFile) {
+        formData.append("file", form.imageFile);
       }
 
-      if (!success) {
-        throw new Error(lastError || "All update endpoints failed. Please check your backend API documentation.");
+      formData.append("username", form.username || "");
+      formData.append("first_name", form.first_name || "");
+      formData.append("last_name", form.last_name || "");
+      formData.append("mobile", form.mobile || "");
+      formData.append("gender", form.gender || "");
+      formData.append("country", form.country || "");
+
+      const res = await fetch(`${base_url}/users/me/update`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.message || "Failed to update profile");
       }
-    } catch (error: any) {
-      console.error("Update error:", error);
-      setErrorMessage(error.message || "Failed to update profile");
+
+      // ✅ Show success message
+      setSuccessMessage("Profile updated successfully!");
+
+      // ✅ If image was uploaded, wait longer for server processing
+      if (hasImageUpload) {
+        // Update cache buster IMMEDIATELY to prepare for reload
+        const newKey = Date.now();
+        setImageKey(newKey);
+        
+        // Wait for server to finish processing image
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Fetch updated profile with the new cache-busted URL
+        await fetchUserProfile();
+        
+        // Update cache buster AGAIN after fetch to ensure fresh image
+        setImageKey(Date.now());
+      } else {
+        // No image upload, just refresh profile data
+        await fetchUserProfile();
+      }
+
+      // ✅ Exit editing mode
+      setEditing(false);
+      setImagePreview(null);
+
+      // ✅ Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
+
+    } catch (err: any) {
+      setErrorMessage(err.message || "Something went wrong");
     } finally {
       setSaving(false);
     }
@@ -258,7 +241,7 @@ export default function ProfilePage() {
         <div className="text-center">
           <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4 sm:mb-6"></div>
           <p className="text-lg sm:text-xl text-gray-700 font-semibold">
-            {authLoading ? 'Loading profile...' : 'Loading profile...'}
+            {authLoading ? 'Restoring session...' : 'Loading profile...'}
           </p>
         </div>
       </div>
@@ -332,7 +315,8 @@ export default function ProfilePage() {
                 <div className="w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-purple-200 shadow-lg mx-auto">
                   {imagePreview || user?.imageUrl ? (
                     <img
-                      src={imagePreview || user?.imageUrl}
+                      key={imageKey} // ✅ Forces re-render when key changes
+                      src={imagePreview || getImageUrl(user?.imageUrl)} // ✅ Cache-busting URL
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -457,34 +441,21 @@ export default function ProfilePage() {
 
                     {/* Username */}
                     <div>
-                      <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5 sm:mb-2">
-                        Username
-                      </label>
+                      <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5 sm:mb-2">Username</label>
                       <div className="relative">
-                        {/* Floating @ sign */}
-                        <span
-                          className={`absolute left-3 transition-all duration-200 pointer-events-none ${
-                            form.username || isUsernameFocused
-                              ? "top-0 -translate-y-1/2 text-xs bg-white px-1 text-purple-600 font-bold"
-                              : "top-1/2 -translate-y-1/2 text-gray-500 font-semibold text-base"
-                          }`}
-                        >
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">
                           @
-                        </span>
-                        
+                        </div>
                         <input
                           type="text"
                           value={form.username}
                           onChange={(e) => setForm({ ...form, username: e.target.value })}
-                          onFocus={() => setIsUsernameFocused(true)}
-                          onBlur={() => setIsUsernameFocused(false)}
-                          placeholder={isUsernameFocused || form.username ? "" : "username"}
-                          className={`w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm ${
-                            form.username || isUsernameFocused ? "pl-3" : "pl-8"
-                          } focus:border-purple-500 focus:ring-4 focus:ring-purple-100`}
+                          placeholder="username"
+                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-8 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
                         />
                       </div>
                     </div>
+
                     {/* Mobile */}
                     <div>
                       <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5 sm:mb-2">Mobile</label>
@@ -560,7 +531,6 @@ export default function ProfilePage() {
                       onClick={() => {
                         setEditing(false);
                         setImagePreview(null);
-                        // Reset form to original values
                         setForm({
                           username: user?.username || "",
                           first_name: user?.first_name || "",
@@ -568,7 +538,7 @@ export default function ProfilePage() {
                           mobile: user?.mobile || "",
                           gender: user?.gender || "",
                           country: user?.country || "",
-                          imageUrl: null,
+                          imageFile: null,
                         });
                       }}
                       disabled={saving}
