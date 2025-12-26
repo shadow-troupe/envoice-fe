@@ -25,27 +25,34 @@ interface Client {
 }
 
 export default function CreateInvoicePage() {
+  const CURRENCIES = [
+    { code: "NGN", label: "NGN - Naira" },
+    { code: "USD", label: "USD - Dollar" },
+    { code: "EUR", label: "EUR - Euro" },
+  ];
+
   const { accessToken } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [client, setClient] = useState<Client | null>(null);
-  
+
   // ✅ Modal states
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  
+
   const [form, setForm] = useState({
     clientId: "",
     issueDate: "",
     dueDate: "",
     notes: "",
-    discountType: "",
+    discountType: null as "PERCENTAGE" | "FIXED" | null,
     discountValue: 0,
     taxRate: 0,
     taxName: "",
+    currency: "NGN",
     template: "MODERN",
     items: [] as InvoiceItem[],
   });
@@ -114,12 +121,16 @@ export default function CreateInvoicePage() {
         }, 2000);
       } else {
         const errorData = await res.json().catch(() => ({}));
-        setErrorMessage(errorData.message || res.statusText || "Failed to create invoice");
+        setErrorMessage(
+          errorData.message || res.statusText || "Failed to create invoice"
+        );
         setShowErrorModal(true);
       }
     } catch (error: any) {
       console.error("Request failed:", error);
-      setErrorMessage(error.message || "Failed to create invoice. Please try again.");
+      setErrorMessage(
+        error.message || "Failed to create invoice. Please try again."
+      );
       setShowErrorModal(true);
     } finally {
       setSubmitting(false);
@@ -215,11 +226,35 @@ export default function CreateInvoicePage() {
                       </p>
                     </div>
                   ) : (
-                    <p className="text-indigo-400">Loading client information...</p>
+                    <p className="text-indigo-400">
+                      Loading client information...
+                    </p>
                   )}
                 </div>
               </div>
 
+              {/* Currency */}
+              <div className="relative">
+                <label className="block text-sm font-semibold text-indigo-700 mb-1">
+                  Currency
+                </label>
+                <select
+                  value={form.currency}
+                  onChange={(e) =>
+                    setForm({ ...form, currency: e.target.value })
+                  }
+                  className="w-full border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3
+      focus:border-indigo-500 focus:ring-4 focus:ring-indigo-200 focus:bg-white
+      transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
+                  required
+                >
+                  {CURRENCIES.map((currency) => (
+                    <option key={currency.code} value={currency.code}>
+                      {currency.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               {/* Issue Date */}
               <div className="relative">
                 <label className="block text-sm font-semibold text-blue-700 mb-1">
@@ -228,7 +263,9 @@ export default function CreateInvoicePage() {
                 <input
                   type="date"
                   value={form.issueDate}
-                  onChange={(e) => setForm({ ...form, issueDate: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, issueDate: e.target.value })
+                  }
                   className="w-full border-2 border-blue-300 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg p-2 sm:p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 text-sm sm:text-base"
                   required
                 />
@@ -242,7 +279,9 @@ export default function CreateInvoicePage() {
                 <input
                   type="date"
                   value={form.dueDate}
-                  onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, dueDate: e.target.value })
+                  }
                   className="w-full border-2 border-purple-300 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-2 sm:p-3 focus:border-purple-500 focus:ring-4 focus:ring-purple-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 text-sm sm:text-base"
                   required
                 />
@@ -257,7 +296,9 @@ export default function CreateInvoicePage() {
                   type="text"
                   placeholder="e.g., VAT, Sales Tax"
                   value={form.taxName}
-                  onChange={(e) => setForm({ ...form, taxName: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, taxName: e.target.value })
+                  }
                   className="w-full border-2 border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-2 sm:p-3 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 placeholder-emerald-400 text-sm sm:text-base"
                 />
               </div>
@@ -271,7 +312,9 @@ export default function CreateInvoicePage() {
                   type="number"
                   placeholder="e.g., 7.5"
                   value={form.taxRate}
-                  onChange={(e) => setForm({ ...form, taxRate: +e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, taxRate: +e.target.value })
+                  }
                   className="w-full border-2 border-green-300 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-2 sm:p-3 focus:border-green-500 focus:ring-4 focus:ring-green-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 placeholder-green-400 text-sm sm:text-base"
                 />
               </div>
@@ -282,9 +325,15 @@ export default function CreateInvoicePage() {
                   Discount Type
                 </label>
                 <select
-                  value={form.discountType}
-                  onChange={(e) => setForm({ ...form, discountType: e.target.value })}
-                  className="w-full border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2 sm:p-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
+                className="w-full border-2 border-amber-300 bg-gradient-to-r from-amber-50 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2 sm:p-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
+                  value={form.discountType || ""} // because null → "", which matches <option value="">
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    const newType =
+                      val === "" ? null : (val as "PERCENTAGE" | "FIXED");
+                    setForm({ ...form, discountType: newType });
+                  }}
+                  // ...rest
                 >
                   <option value="">No Discount</option>
                   <option value="PERCENTAGE">Percentage Discount</option>
@@ -301,7 +350,9 @@ export default function CreateInvoicePage() {
                   type="number"
                   placeholder="e.g., 10 or 500"
                   value={form.discountValue}
-                  onChange={(e) => setForm({ ...form, discountValue: +e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, discountValue: +e.target.value })
+                  }
                   className="w-full border-2 border-rose-300 bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg p-2 sm:p-3 focus:border-rose-500 focus:ring-4 focus:ring-rose-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 placeholder-rose-400 text-sm sm:text-base"
                 />
               </div>
@@ -342,7 +393,9 @@ export default function CreateInvoicePage() {
                           type="text"
                           placeholder="Item description"
                           value={item.description}
-                          onChange={(e) => updateItem(i, "description", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(i, "description", e.target.value)
+                          }
                           className="w-full border-2 border-blue-300 bg-white rounded-lg p-2 focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-blue-400 text-sm"
                           required
                         />
@@ -356,7 +409,9 @@ export default function CreateInvoicePage() {
                             type="text"
                             placeholder="Qty"
                             value={item.quantity}
-                            onChange={(e) => updateItem(i, "quantity", +e.target.value)}
+                            onChange={(e) =>
+                              updateItem(i, "quantity", +e.target.value)
+                            }
                             className="w-full border-2 border-green-300 bg-white rounded-lg p-2 focus:border-green-500 focus:ring-3 focus:ring-green-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-green-400 text-sm"
                             required
                           />
@@ -369,7 +424,9 @@ export default function CreateInvoicePage() {
                             type="text"
                             placeholder="Price"
                             value={item.unitPrice}
-                            onChange={(e) => updateItem(i, "unitPrice", +e.target.value)}
+                            onChange={(e) =>
+                              updateItem(i, "unitPrice", +e.target.value)
+                            }
                             className="w-full border-2 border-amber-300 bg-white rounded-lg p-2 focus:border-amber-500 focus:ring-3 focus:ring-amber-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-amber-400 text-sm"
                             required
                           />
@@ -382,7 +439,9 @@ export default function CreateInvoicePage() {
                             type="text"
                             placeholder="Disc."
                             value={item.discount || 0}
-                            onChange={(e) => updateItem(i, "discount", +e.target.value)}
+                            onChange={(e) =>
+                              updateItem(i, "discount", +e.target.value)
+                            }
                             className="w-full border-2 border-purple-300 bg-white rounded-lg p-2 focus:border-purple-500 focus:ring-3 focus:ring-purple-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-purple-400 text-sm"
                           />
                         </div>
@@ -406,7 +465,9 @@ export default function CreateInvoicePage() {
                           type="text"
                           placeholder="Item description"
                           value={item.description}
-                          onChange={(e) => updateItem(i, "description", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(i, "description", e.target.value)
+                          }
                           className="w-full border-2 border-blue-300 bg-white rounded-lg p-2 focus:border-blue-500 focus:ring-3 focus:ring-blue-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-blue-400"
                           required
                         />
@@ -419,7 +480,9 @@ export default function CreateInvoicePage() {
                           type="text"
                           placeholder="Qty"
                           value={item.quantity}
-                          onChange={(e) => updateItem(i, "quantity", +e.target.value)}
+                          onChange={(e) =>
+                            updateItem(i, "quantity", +e.target.value)
+                          }
                           className="w-full border-2 border-green-300 bg-white rounded-lg p-2 focus:border-green-500 focus:ring-3 focus:ring-green-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-green-400"
                           required
                         />
@@ -432,7 +495,9 @@ export default function CreateInvoicePage() {
                           type="text"
                           placeholder="Price"
                           value={item.unitPrice}
-                          onChange={(e) => updateItem(i, "unitPrice", +e.target.value)}
+                          onChange={(e) =>
+                            updateItem(i, "unitPrice", +e.target.value)
+                          }
                           className="w-full border-2 border-amber-300 bg-white rounded-lg p-2 focus:border-amber-500 focus:ring-3 focus:ring-amber-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-amber-400"
                           required
                         />
@@ -445,7 +510,9 @@ export default function CreateInvoicePage() {
                           type="number"
                           placeholder="Disc."
                           value={item.discount || 0}
-                          onChange={(e) => updateItem(i, "discount", +e.target.value)}
+                          onChange={(e) =>
+                            updateItem(i, "discount", +e.target.value)
+                          }
                           className="w-full border-2 border-purple-300 bg-white rounded-lg p-2 focus:border-purple-500 focus:ring-3 focus:ring-purple-200 transition-all duration-200 outline-none font-medium text-gray-800 placeholder-purple-400"
                         />
                       </div>
@@ -512,7 +579,11 @@ export default function CreateInvoicePage() {
                   Invoice Created Successfully!
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Your invoice with <span className="font-semibold text-purple-600">{form.template}</span> template has been created.
+                  Your invoice with{" "}
+                  <span className="font-semibold text-purple-600">
+                    {form.template}
+                  </span>{" "}
+                  template has been created.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
                   <Loader2 className="animate-spin" size={16} />
@@ -549,38 +620,6 @@ export default function CreateInvoicePage() {
           </div>
         </>
       )}
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes scale-in {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out;
-        }
-
-        .animate-scale-in {
-          animation: scale-in 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

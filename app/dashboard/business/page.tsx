@@ -1,16 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Trash2, Building2, MapPin, Phone, Upload, X, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Building2,
+  MapPin,
+  Phone,
+  Upload,
+  X,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-
-const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 interface BusinessProfile {
   name: string;
   location: string;
   contact: string;
+  currency: string;
   logo?: string;
 }
 
@@ -21,25 +31,26 @@ export default function BusinessProfilePage() {
   const [editing, setEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  
+
   // ✅ NEW: Add submitting state for loading indicator
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [form, setForm] = useState({
     name: "",
     location: "",
     contact: "",
+    currency: "",
     logo: null as File | null,
   });
 
-useEffect(() => {
+  useEffect(() => {
     // Wait for AuthContext to finish loading before fetching
     if (!authLoading && accessToken) {
       fetchProfile();
     } else if (!authLoading && !accessToken) {
       // Auth finished loading but no token found
       console.log("No token after auth loading complete, redirecting to login");
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
   }, [authLoading, accessToken]);
 
@@ -54,7 +65,7 @@ useEffect(() => {
       if (res.status === 401) {
         console.error("Token is invalid or expired. Redirecting to login...");
         clearAuth();
-        window.location.href = '/login';
+        window.location.href = "/login";
         return;
       }
 
@@ -95,6 +106,7 @@ useEffect(() => {
     formData.append("name", form.name);
     formData.append("location", form.location);
     formData.append("contact", form.contact);
+    formData.append("currency", form.currency);
     if (form.logo) formData.append("file", form.logo);
 
     const url =
@@ -113,8 +125,8 @@ useEffect(() => {
 
       if (res.ok) {
         // ✅ NEW: Show success state briefly before reload
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // ✅ NEW: Reload the page to show updated logo
         window.location.reload();
       } else {
@@ -144,13 +156,13 @@ useEffect(() => {
     }
   };
 
-if (authLoading || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-20 h-20 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
           <p className="text-xl text-gray-700 font-semibold">
-            {authLoading ? 'Loading profile...' : 'Loading profile...'}
+            {authLoading ? "Loading profile..." : "Loading profile..."}
           </p>
         </div>
       </div>
@@ -169,7 +181,9 @@ if (authLoading || loading) {
             <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Business Profile
             </h1>
-            <p className="text-gray-600 text-sm mt-1">Manage your business information</p>
+            <p className="text-gray-600 text-sm mt-1">
+              Manage your business information
+            </p>
           </div>
         </div>
 
@@ -199,10 +213,15 @@ if (authLoading || loading) {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 lg:p-8 space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="p-4 sm:p-6 lg:p-8 space-y-5"
+            >
               {/* Logo Upload */}
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">Business Logo</label>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  Business Logo
+                </label>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                     {logoPreview || profile?.logo ? (
@@ -233,14 +252,18 @@ if (authLoading || loading) {
                       <Upload size={18} />
                       Choose Logo
                     </label>
-                    <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 5MB</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      PNG, JPG up to 5MB
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Business Name */}
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">Business Name</label>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  Business Name
+                </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <Building2 className="text-blue-600" size={20} />
@@ -259,7 +282,9 @@ if (authLoading || loading) {
 
               {/* Location */}
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">Location</label>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  Location
+                </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <MapPin className="text-green-600" size={20} />
@@ -267,7 +292,9 @@ if (authLoading || loading) {
                   <input
                     type="text"
                     value={form.location}
-                    onChange={(e) => setForm({ ...form, location: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, location: e.target.value })
+                    }
                     disabled={submitting}
                     placeholder="e.g., 123 Main St, New York, NY"
                     className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 pl-11 focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm sm:text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -278,7 +305,9 @@ if (authLoading || loading) {
 
               {/* Contact */}
               <div>
-                <label className="block text-sm font-bold text-gray-800 mb-2">Contact</label>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  Contact
+                </label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                     <Phone className="text-purple-600" size={20} />
@@ -286,12 +315,39 @@ if (authLoading || loading) {
                   <input
                     type="text"
                     value={form.contact}
-                    onChange={(e) => setForm({ ...form, contact: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, contact: e.target.value })
+                    }
                     disabled={submitting}
                     placeholder="e.g., +1 (555) 123-4567"
                     className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 pl-11 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm sm:text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     required
                   />
+                </div>
+              </div>
+
+              {/* Currency */}
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-2">
+                  Business Currency
+                </label>
+                <div className="relative">
+                  <select
+                    value={form.currency}
+                    onChange={(e) =>
+                      setForm({ ...form, currency: e.target.value })
+                    }
+                    disabled={submitting}
+                    required
+                    className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none text-gray-900 font-medium text-sm sm:text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="" disabled>
+                      Select currency
+                    </option>
+                    <option value="NGN">₦ Nigerian Naira (NGN)</option>
+                    <option value="USD">$ US Dollar (USD)</option>
+                    <option value="EUR">€ Euro (EUR)</option>
+                  </select>
                 </div>
               </div>
 
@@ -358,6 +414,7 @@ if (authLoading || loading) {
                         name: profile.name || "",
                         location: profile.location || "",
                         contact: profile.contact || "",
+                        currency: profile.currency || "NGN",
                         logo: null,
                       });
                       setEditing(true);
@@ -385,7 +442,9 @@ if (authLoading || loading) {
                   <MapPin className="text-green-600" size={24} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Location</p>
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    Location
+                  </p>
                   <p className="text-gray-900 font-semibold text-base sm:text-lg">
                     {profile.location}
                   </p>
@@ -398,7 +457,9 @@ if (authLoading || loading) {
                   <Phone className="text-purple-600" size={24} />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Contact</p>
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    Contact
+                  </p>
                   <p className="text-gray-900 font-semibold text-base sm:text-lg">
                     {profile.contact}
                   </p>
@@ -412,7 +473,9 @@ if (authLoading || loading) {
             <div className="bg-gray-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
               <Building2 size={48} className="text-gray-400" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No Business Profile</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              No Business Profile
+            </h3>
             <p className="text-gray-600 mb-6">
               Create your business profile to get started
             </p>
@@ -429,13 +492,13 @@ if (authLoading || loading) {
         {/* DELETE CONFIRMATION MODAL */}
         {showDeleteModal && (
           <>
-            <div 
+            <div
               className="fixed inset-0 z-40 bg-black/40 backdrop-blur-lg animate-fade-in"
               onClick={() => setShowDeleteModal(false)}
             ></div>
-            
+
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-              <div 
+              <div
                 className="bg-white rounded-lg shadow-2xl w-full max-w-md transform transition-all duration-300 animate-scale-in pointer-events-auto border border-gray-100"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -447,7 +510,8 @@ if (authLoading || loading) {
                     Delete Business Profile?
                   </h2>
                   <p className="text-gray-600 text-center mb-8">
-                    This action cannot be undone. All profile information will be permanently removed.
+                    This action cannot be undone. All profile information will
+                    be permanently removed.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button

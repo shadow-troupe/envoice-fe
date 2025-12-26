@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Trash2, FileText, Eye, CheckCircle, Clock, AlertCircle, Check, Download, Loader2 } from "lucide-react";
+import {
+  Trash2,
+  FileText,
+  Eye,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Check,
+  Download,
+  Loader2,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -28,6 +38,7 @@ interface Invoice {
   taxRate?: number;
   taxName?: string;
   totalAmount: number;
+  currency?: "NGN" | "USD" | "EUR";
   items: InvoiceItem[];
   client?: {
     id: string;
@@ -35,6 +46,16 @@ interface Invoice {
     email?: string;
   };
 }
+
+const currencySymbols: Record<string, string> = {
+  NGN: "₦",
+  USD: "$",
+  EUR: "€",
+};
+
+const getCurrencySymbol = (currency?: string) => {
+  return currencySymbols[currency ?? "NGN"] || "₦";
+};
 
 export default function InvoiceListPage() {
   const { accessToken, isLoading: authLoading } = useAuth();
@@ -65,8 +86,9 @@ export default function InvoiceListPage() {
       if (res.ok) {
         const data = await res.json();
         // ✅ Sort by date - NEWEST FIRST (most recent to oldest)
-        const sortedData = data.sort((a: Invoice, b: Invoice) => 
-          new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
+        const sortedData = data.sort(
+          (a: Invoice, b: Invoice) =>
+            new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime()
         );
         setInvoices(sortedData);
       }
@@ -93,10 +115,10 @@ export default function InvoiceListPage() {
 
   const handleMarkAsPaid = async (invoiceId: string) => {
     setMarkingPaid(invoiceId);
-    
+
     try {
       const endpoints = [
-        { url: `${base_url}/invoices/update/${invoiceId}`, method: 'PATCH' },
+        { url: `${base_url}/invoices/update/${invoiceId}`, method: "PATCH" },
       ];
 
       let success = false;
@@ -114,11 +136,11 @@ export default function InvoiceListPage() {
 
           if (res.ok) {
             success = true;
-            setInvoices(invoices.map(inv => 
-              inv.id === invoiceId 
-                ? { ...inv, status: "PAID" }
-                : inv
-            ));
+            setInvoices(
+              invoices.map((inv) =>
+                inv.id === invoiceId ? { ...inv, status: "PAID" } : inv
+              )
+            );
             break;
           }
         } catch (err) {
@@ -139,10 +161,10 @@ export default function InvoiceListPage() {
   // ✅ DOWNLOAD PDF WITH BUSINESS COPY WATERMARK
   const handleDownloadPdf = async (invoiceId: string) => {
     setDownloadingPdf(invoiceId);
-    
+
     try {
       const res = await fetch(`${base_url}/invoices/${invoiceId}/pdf`, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -151,25 +173,25 @@ export default function InvoiceListPage() {
       if (res.ok) {
         const blob = await res.blob();
         const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        
+
         // Get invoice number for filename
-        const invoice = invoices.find(inv => inv.id === invoiceId);
-        const invoiceNumber = invoice?.id?.slice(0, 8) || 'invoice';
+        const invoice = invoices.find((inv) => inv.id === invoiceId);
+        const invoiceNumber = invoice?.id?.slice(0, 8) || "invoice";
         link.download = `BUSINESS-COPY-${invoiceNumber}.pdf`;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
       } else {
-        console.error('Failed to download PDF');
-        alert('Failed to download PDF. Please try again.');
+        console.error("Failed to download PDF");
+        alert("Failed to download PDF. Please try again.");
       }
     } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert('Failed to download PDF. Please try again.');
+      console.error("Error downloading PDF:", error);
+      alert("Failed to download PDF. Please try again.");
     } finally {
       setDownloadingPdf(null);
     }
@@ -182,29 +204,29 @@ export default function InvoiceListPage() {
   const getInvoiceStatus = (invoice: Invoice) => {
     if (invoice.status) {
       const status = invoice.status.toUpperCase();
-      if (status === 'PAID') return 'paid';
-      if (status === 'PENDING') {
+      if (status === "PAID") return "paid";
+      if (status === "PENDING") {
         const dueDate = new Date(invoice.dueDate);
         const now = new Date();
-        if (dueDate < now) return 'overdue';
-        return 'pending';
+        if (dueDate < now) return "overdue";
+        return "pending";
       }
     }
-    
+
     const dueDate = new Date(invoice.dueDate);
     const now = new Date();
-    if (dueDate < now) return 'overdue';
-    return 'pending';
+    if (dueDate < now) return "overdue";
+    return "pending";
   };
 
   const filteredInvoices = invoices.filter((inv) => {
     const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = (
+    const matchesSearch =
       inv.id.toLowerCase().includes(searchLower) ||
       inv.client?.name?.toLowerCase().includes(searchLower) ||
       inv.client?.email?.toLowerCase().includes(searchLower) ||
-      inv.totalAmount.toString().includes(searchLower)
-    );
+      inv.totalAmount.toString().includes(searchLower) ||
+      inv.currency?.toLowerCase().includes(searchLower);
 
     if (!matchesSearch) return false;
 
@@ -227,7 +249,9 @@ export default function InvoiceListPage() {
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-lg text-gray-700 font-medium">Loading invoices...</p>
+          <p className="text-lg text-gray-700 font-medium">
+            Loading invoices...
+          </p>
         </div>
       </div>
     );
@@ -246,7 +270,9 @@ export default function InvoiceListPage() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 Invoices
               </h1>
-              <p className="text-gray-600 text-sm mt-1">{filteredInvoices.length} total invoices • Newest first</p>
+              <p className="text-gray-600 text-sm mt-1">
+                {filteredInvoices.length} total invoices • Newest first
+              </p>
             </div>
           </div>
         </div>
@@ -284,16 +310,19 @@ export default function InvoiceListPage() {
               onClick={() => setStatusFilter("all")}
               className={`
                 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 transform hover:scale-105
-                ${statusFilter === "all"
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border-2 border-gray-300 hover:border-indigo-300"
+                ${
+                  statusFilter === "all"
+                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border-2 border-gray-300 hover:border-indigo-300"
                 }
               `}
             >
               All Invoices
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                statusFilter === "all" ? "bg-white/20" : "bg-gray-200"
-              }`}>
+              <span
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  statusFilter === "all" ? "bg-white/20" : "bg-gray-200"
+                }`}
+              >
                 {invoices.length}
               </span>
             </button>
@@ -302,17 +331,23 @@ export default function InvoiceListPage() {
               onClick={() => setStatusFilter("paid")}
               className={`
                 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 transform hover:scale-105
-                ${statusFilter === "paid"
-                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border-2 border-gray-300 hover:border-green-300"
+                ${
+                  statusFilter === "paid"
+                    ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border-2 border-gray-300 hover:border-green-300"
                 }
               `}
             >
               Paid
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                statusFilter === "paid" ? "bg-white/20" : "bg-gray-200"
-              }`}>
-                {invoices.filter(inv => getInvoiceStatus(inv) === 'paid').length}
+              <span
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  statusFilter === "paid" ? "bg-white/20" : "bg-gray-200"
+                }`}
+              >
+                {
+                  invoices.filter((inv) => getInvoiceStatus(inv) === "paid")
+                    .length
+                }
               </span>
             </button>
 
@@ -320,17 +355,23 @@ export default function InvoiceListPage() {
               onClick={() => setStatusFilter("pending")}
               className={`
                 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 transform hover:scale-105
-                ${statusFilter === "pending"
-                  ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-300"
+                ${
+                  statusFilter === "pending"
+                    ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-300"
                 }
               `}
             >
               Pending
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                statusFilter === "pending" ? "bg-white/20" : "bg-gray-200"
-              }`}>
-                {invoices.filter(inv => getInvoiceStatus(inv) === 'pending').length}
+              <span
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  statusFilter === "pending" ? "bg-white/20" : "bg-gray-200"
+                }`}
+              >
+                {
+                  invoices.filter((inv) => getInvoiceStatus(inv) === "pending")
+                    .length
+                }
               </span>
             </button>
 
@@ -338,17 +379,23 @@ export default function InvoiceListPage() {
               onClick={() => setStatusFilter("overdue")}
               className={`
                 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 transform hover:scale-105
-                ${statusFilter === "overdue"
-                  ? "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md"
-                  : "bg-white text-gray-700 border-2 border-gray-300 hover:border-red-300"
+                ${
+                  statusFilter === "overdue"
+                    ? "bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md"
+                    : "bg-white text-gray-700 border-2 border-gray-300 hover:border-red-300"
                 }
               `}
             >
               Overdue
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                statusFilter === "overdue" ? "bg-white/20" : "bg-gray-200"
-              }`}>
-                {invoices.filter(inv => getInvoiceStatus(inv) === 'overdue').length}
+              <span
+                className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                  statusFilter === "overdue" ? "bg-white/20" : "bg-gray-200"
+                }`}
+              >
+                {
+                  invoices.filter((inv) => getInvoiceStatus(inv) === "overdue")
+                    .length
+                }
               </span>
             </button>
           </div>
@@ -360,18 +407,20 @@ export default function InvoiceListPage() {
             <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-lg text-center border border-gray-100">
               <FileText size={48} className="mx-auto mb-4 text-gray-300" />
               <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                {searchQuery || statusFilter !== "all" ? 'No Invoices Found' : 'No Invoices Yet'}
+                {searchQuery || statusFilter !== "all"
+                  ? "No Invoices Found"
+                  : "No Invoices Yet"}
               </h3>
               <p className="text-gray-600 mb-6">
                 {searchQuery || statusFilter !== "all"
-                  ? 'Try adjusting your search terms or filters' 
-                  : 'Create invoices from your client pages'}
+                  ? "Try adjusting your search terms or filters"
+                  : "Create invoices from your client pages"}
               </p>
               {(searchQuery || statusFilter !== "all") && (
                 <button
                   onClick={() => {
-                    setSearchQuery('');
-                    setStatusFilter('all');
+                    setSearchQuery("");
+                    setStatusFilter("all");
                   }}
                   className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-200 hover:scale-105 shadow-lg font-semibold"
                 >
@@ -382,7 +431,7 @@ export default function InvoiceListPage() {
           ) : (
             paginatedInvoices.map((inv, idx) => {
               const status = getInvoiceStatus(inv);
-              
+
               return (
                 <div
                   key={inv.id}
@@ -398,15 +447,25 @@ export default function InvoiceListPage() {
                             Invoice #{inv.id.slice(0, 8)}
                           </h2>
                           {/* Status Badge */}
-                          <span className={`
+                          <span
+                            className={`
                             inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold
-                            ${status === 'paid' ? 'bg-green-100 text-green-700' :
-                              status === 'overdue' ? 'bg-red-100 text-red-700' :
-                              'bg-amber-100 text-amber-700'}
-                          `}>
-                            {status === 'paid' ? <CheckCircle size={12} /> :
-                             status === 'overdue' ? <AlertCircle size={12} /> :
-                             <Clock size={12} />}
+                            ${
+                              status === "paid"
+                                ? "bg-green-100 text-green-700"
+                                : status === "overdue"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-amber-100 text-amber-700"
+                            }
+                          `}
+                          >
+                            {status === "paid" ? (
+                              <CheckCircle size={12} />
+                            ) : status === "overdue" ? (
+                              <AlertCircle size={12} />
+                            ) : (
+                              <Clock size={12} />
+                            )}
                             {status.charAt(0).toUpperCase() + status.slice(1)}
                           </span>
                         </div>
@@ -414,7 +473,9 @@ export default function InvoiceListPage() {
                           {inv.client?.name || "Client"}
                         </p>
                         {inv.client?.email && (
-                          <p className="text-gray-500 text-sm">{inv.client.email}</p>
+                          <p className="text-gray-500 text-sm">
+                            {inv.client.email}
+                          </p>
                         )}
                       </div>
                       <div className="flex gap-2 flex-wrap">
@@ -436,7 +497,7 @@ export default function InvoiceListPage() {
                         </button>
 
                         {/* Mark as Paid Button */}
-                        {status !== 'paid' && (
+                        {status !== "paid" && (
                           <button
                             onClick={() => handleMarkAsPaid(inv.id)}
                             disabled={markingPaid === inv.id}
@@ -453,7 +514,7 @@ export default function InvoiceListPage() {
                             </span>
                           </button>
                         )}
-                        
+
                         <button
                           onClick={() => toggleExpandInvoice(inv.id)}
                           className="p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transform transition-all duration-200 hover:scale-110 shadow-md relative group"
@@ -464,7 +525,7 @@ export default function InvoiceListPage() {
                             View Details
                           </span>
                         </button>
-                        
+
                         <button
                           onClick={() => {
                             setInvoiceToDelete(inv.id);
@@ -480,7 +541,7 @@ export default function InvoiceListPage() {
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
                       <div>
                         <p className="text-gray-500 mb-1">Issue Date</p>
@@ -490,16 +551,22 @@ export default function InvoiceListPage() {
                       </div>
                       <div>
                         <p className="text-gray-500 mb-1">Due Date</p>
-                        <p className={`font-semibold ${
-                          status === 'overdue' ? 'text-red-600' : 'text-gray-800'
-                        }`}>
+                        <p
+                          className={`font-semibold ${
+                            status === "overdue"
+                              ? "text-red-600"
+                              : "text-gray-800"
+                          }`}
+                        >
                           {new Date(inv.dueDate).toLocaleDateString()}
                         </p>
                       </div>
+
                       <div>
                         <p className="text-gray-500 mb-1">Total Amount</p>
                         <p className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                          ${inv.totalAmount.toFixed(2)}
+                          {getCurrencySymbol(inv.currency)}
+                          {inv.totalAmount.toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -510,7 +577,9 @@ export default function InvoiceListPage() {
                     <div className="border-t border-gray-200 bg-gradient-to-br from-indigo-50 to-purple-50 p-4 sm:p-6 animate-fade-in">
                       {/* Invoice Items */}
                       <div className="mb-4">
-                        <h3 className="text-lg font-bold text-gray-800 mb-3">Invoice Items</h3>
+                        <h3 className="text-lg font-bold text-gray-800 mb-3">
+                          Invoice Items
+                        </h3>
                         <div className="space-y-2">
                           {inv.items && inv.items.length > 0 ? (
                             inv.items.map((item, i) => (
@@ -520,22 +589,40 @@ export default function InvoiceListPage() {
                               >
                                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:gap-4">
                                   <div className="sm:col-span-2">
-                                    <p className="text-xs text-gray-500 mb-1">Description</p>
-                                    <p className="font-semibold text-gray-800">{item.description}</p>
+                                    <p className="text-xs text-gray-500 mb-1">
+                                      Description
+                                    </p>
+                                    <p className="font-semibold text-gray-800">
+                                      {item.description}
+                                    </p>
                                   </div>
                                   <div>
-                                    <p className="text-xs text-gray-500 mb-1">Quantity</p>
-                                    <p className="font-semibold text-gray-800">{item.quantity}</p>
+                                    <p className="text-xs text-gray-500 mb-1">
+                                      Quantity
+                                    </p>
+                                    <p className="font-semibold text-gray-800">
+                                      {item.quantity}
+                                    </p>
                                   </div>
                                   <div>
-                                    <p className="text-xs text-gray-500 mb-1">Unit Price</p>
-                                    <p className="font-semibold text-gray-800">${item.unitPrice.toFixed(2)}</p>
+                                    <p className="text-xs text-gray-500 mb-1">
+                                      Unit Price
+                                    </p>
+                                    <p className="font-semibold text-gray-800">
+                                      {getCurrencySymbol(inv.currency)}
+                                      {item.unitPrice.toFixed(2)}
+                                    </p>
                                   </div>
                                 </div>
                                 {item.discount && item.discount > 0 && (
                                   <div className="mt-2 pt-2 border-t border-gray-200">
                                     <p className="text-xs text-gray-500">
-                                      Discount: {item.isPercentageDiscount ? `${item.discount}%` : `$${item.discount}`}
+                                      Discount:{" "}
+                                      {item.isPercentageDiscount
+                                        ? `${item.discount}%`
+                                        : `${getCurrencySymbol(inv.currency)}${
+                                            item.discount
+                                          }`}
                                     </p>
                                   </div>
                                 )}
@@ -559,11 +646,15 @@ export default function InvoiceListPage() {
                         )}
                         {inv.discountType && inv.discountValue && (
                           <div className="bg-white p-3 rounded-xl border border-amber-200">
-                            <p className="text-xs text-gray-500 mb-1">Discount</p>
+                            <p className="text-xs text-gray-500 mb-1">
+                              Discount
+                            </p>
                             <p className="font-semibold text-gray-800">
-                              {inv.discountType === "PERCENTAGE" 
-                                ? `${inv.discountValue}%` 
-                                : `$${inv.discountValue}`}
+                              {inv.discountType === "PERCENTAGE"
+                                ? `${inv.discountValue}%`
+                                : `${getCurrencySymbol(inv.currency)}${
+                                    inv.discountValue
+                                  }`}
                             </p>
                           </div>
                         )}
@@ -588,53 +679,59 @@ export default function InvoiceListPage() {
         {filteredInvoices.length > 0 && totalPages > 1 && (
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-md">
             <div className="text-sm text-gray-600">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredInvoices.length)} of {filteredInvoices.length} invoices
+              Showing {startIndex + 1}-
+              {Math.min(endIndex, filteredInvoices.length)} of{" "}
+              {filteredInvoices.length} invoices
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-200 hover:scale-105 shadow-md font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 Previous
               </button>
-              
+
               <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
-                  if (
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`w-10 h-10 rounded-lg font-medium text-sm transition-all duration-200 ${
-                          currentPage === page
-                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  } else if (
-                    page === currentPage - 2 ||
-                    page === currentPage + 2
-                  ) {
-                    return (
-                      <span key={page} className="px-2 text-gray-400">
-                        ...
-                      </span>
-                    );
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => {
+                    if (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-10 h-10 rounded-lg font-medium text-sm transition-all duration-200 ${
+                            currentPage === page
+                              ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    } else if (
+                      page === currentPage - 2 ||
+                      page === currentPage + 2
+                    ) {
+                      return (
+                        <span key={page} className="px-2 text-gray-400">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
                   }
-                  return null;
-                })}
+                )}
               </div>
 
               <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-200 hover:scale-105 shadow-md font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
@@ -652,10 +749,13 @@ export default function InvoiceListPage() {
                 <div className="bg-red-100 p-2 sm:p-3 rounded-full">
                   <Trash2 className="text-red-600" size={20} />
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Delete Invoice</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+                  Delete Invoice
+                </h2>
               </div>
               <p className="text-gray-600 mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">
-                Are you sure you want to delete this invoice? This action cannot be undone.
+                Are you sure you want to delete this invoice? This action cannot
+                be undone.
               </p>
               <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
