@@ -5,7 +5,7 @@ export async function refreshAccessToken(refreshToken: string): Promise<{ access
   try {
     console.log("Attempting to refresh access token...");
     
-    const res = await fetch(`${base_url}/auth/refresh`, {
+    const res = await fetch(`${base_url}/auth/refresh-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
