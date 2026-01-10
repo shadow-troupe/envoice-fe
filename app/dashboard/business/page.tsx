@@ -174,11 +174,11 @@ export default function BusinessProfilePage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6 sm:mb-8 animate-fade-in">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
+          <div className="bg-blue-900 p-3 rounded-2xl shadow-lg">
             <Building2 className="text-white" size={32} />
           </div>
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
               Business Profile
             </h1>
             <p className="text-gray-600 text-sm mt-1">
@@ -190,7 +190,7 @@ export default function BusinessProfilePage() {
         {editing ? (
           // FORM SECTION
           <div className="bg-white/95 backdrop-blur-xl rounded-lg shadow-2xl border border-white/20 overflow-hidden animate-scale-in">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-6">
+            <div className="bg-blue-900 p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 backdrop-blur-sm p-2 sm:p-3 rounded-lg">
@@ -245,7 +245,7 @@ export default function BusinessProfilePage() {
                     />
                     <label
                       htmlFor="logo-upload"
-                      className={`cursor-pointer inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 rounded-lg hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-md font-medium text-sm ${
+                      className={`cursor-pointer inline-flex items-center gap-2 bg-blue-900 text-white px-4 py-2.5 rounded-lg hover:from-blue-400 hover:to-blue-700 transform transition-all duration-200 hover:scale-105 shadow-md font-medium text-sm ${
                         submitting ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -339,7 +339,7 @@ export default function BusinessProfilePage() {
                     }
                     disabled={submitting}
                     required
-                    className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all duration-200 outline-none text-gray-900 font-medium text-sm sm:text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none text-gray-900 font-medium text-sm sm:text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="" disabled>
                       Select currency
@@ -384,7 +384,7 @@ export default function BusinessProfilePage() {
         ) : profile ? (
           // PROFILE DISPLAY
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-scale-in">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 sm:p-8">
+            <div className="bg-blue-900 p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-4">
                   {profile.logo ? (
@@ -481,7 +481,7 @@ export default function BusinessProfilePage() {
             </p>
             <button
               onClick={() => setEditing(true)}
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-indigo-700 transform transition-all duration-200 hover:scale-105 shadow-lg font-semibold inline-flex items-center gap-2"
+              className="bg-blue-900 text-white px-8 py-3 rounded-lg hover:from-blue-300 hover:to-blue-700 transform transition-all duration-200 hover:scale-105 shadow-lg font-semibold inline-flex items-center gap-2"
             >
               <Building2 size={20} />
               Create Profile

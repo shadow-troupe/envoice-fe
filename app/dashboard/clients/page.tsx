@@ -98,7 +98,7 @@ export default function ClientPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-20 h-20 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <div className="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
           <p className="text-xl text-gray-700 font-semibold">Loading clients...</p>
         </div>
       </div>
@@ -111,11 +111,11 @@ export default function ClientPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 animate-fade-in">
           <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
+            <div className="bg-blue-900 p-3 rounded-2xl shadow-lg">
               <Users className="text-white" size={32} />
             </div>
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
                 Clients
               </h1>
               <p className="text-gray-600 text-sm mt-1">{clients.length} total clients</p>
@@ -142,7 +142,7 @@ export default function ClientPage() {
                 style={{ animationDelay: `${idx * 100}ms` }}
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
+                <div className="bg-blue-900 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="bg-white bg-opacity-20 backdrop-blur-sm p-2 rounded-lg">
                       <Users className="text-white" size={24} />
@@ -194,7 +194,7 @@ export default function ClientPage() {
                 <div className="px-5 pb-5">
                   <button
                     onClick={() => navigateToInvoice(client.id)}
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold flex items-center justify-center gap-2"
+                    className="w-full bg-blue-900 text-white py-3 rounded-xl hover:from-blue-400 hover:to-blue-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold flex items-center justify-center gap-2"
                   >
                     <FileText size={18} />
                     Create Invoice
@@ -368,7 +368,7 @@ export default function ClientPage() {
                         setShowSuccessModal(false);
                         navigateToInvoice(newlyCreatedClient.id);
                       }}
-                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-xl hover:from-indigo-600 hover:to-purple-700 transform transition-all duration-200 hover:scale-105 shadow-lg font-semibold flex items-center justify-center gap-2"
+                      className="w-full bg-blue-900 text-white py-3 rounded-xl hover:from-blue-400 hover:to-blue-700 transform transition-all duration-200 hover:scale-105 shadow-lg font-semibold flex items-center justify-center gap-2"
                     >
                       <FileText size={20} />
                       Create Invoice for {newlyCreatedClient.name}

@@ -170,7 +170,7 @@ export default function CreateInvoicePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-lg text-gray-700 font-medium">
             Loading invoice form...
           </p>
@@ -191,7 +191,7 @@ export default function CreateInvoicePage() {
             <ArrowLeft size={24} className="text-gray-700" />
           </button>
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold  bg-blue-900 bg-clip-text text-transparent">
               Create Invoice
             </h1>
             <p className="text-gray-600 text-sm mt-1">
@@ -214,19 +214,19 @@ export default function CreateInvoicePage() {
             {/* Client Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="relative sm:col-span-2">
-                <label className="block text-sm font-semibold text-indigo-700 mb-1">
+                <label className="block text-sm font-semibold text-blue-700 mb-1">
                   Client
                 </label>
-                <div className="w-full border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 font-medium text-gray-800 text-sm sm:text-base">
+                <div className="w-full border-2 border-blue-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 font-medium text-gray-800 text-sm sm:text-base">
                   {client ? (
                     <div>
-                      <p className="font-bold text-indigo-900">{client.name}</p>
+                      <p className="font-bold text-blue-900">{client.name}</p>
                       <p className="text-xs text-gray-600 mt-1">
                         {client.email} • {client.phone}
                       </p>
                     </div>
                   ) : (
-                    <p className="text-indigo-400">
+                    <p className="text-blue-400">
                       Loading client information...
                     </p>
                   )}
@@ -243,8 +243,8 @@ export default function CreateInvoicePage() {
                   onChange={(e) =>
                     setForm({ ...form, currency: e.target.value })
                   }
-                  className="w-full border-2 border-indigo-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3
-      focus:border-indigo-500 focus:ring-4 focus:ring-indigo-200 focus:bg-white
+                  className="w-full border-2 border-blue-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3
+      focus:border-blue-500 focus:ring-4 focus:ring-blue-200 focus:bg-white
       transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
                   required
                 >
@@ -381,7 +381,7 @@ export default function CreateInvoicePage() {
                 {form.items.map((item, i) => (
                   <div
                     key={i}
-                    className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-3 sm:p-4 rounded-xl border-2 border-indigo-200"
+                    className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-3 sm:p-4 rounded-xl border-2 border-blue-200"
                   >
                     {/* Mobile Layout */}
                     <div className="grid grid-cols-1 gap-3 sm:hidden">

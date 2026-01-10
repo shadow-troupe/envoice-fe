@@ -52,7 +52,7 @@ export default function Sidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-blue-900 text-white rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
       >
         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -77,7 +77,7 @@ export default function Sidebar() {
       >
         {/* Header */}
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 opacity-90"></div>
+          <div className="absolute inset-0 bg-blue-900 via-purple-600 to-pink-600 opacity-90"></div>
           <div className="relative p-6 text-center">
             <div className="bg-white/20 backdrop-blur-lg inline-block p-3 rounded-2xl mb-3">
               <FileText className="text-white" size={32} />
@@ -92,8 +92,8 @@ export default function Sidebar() {
         {/* User Info */}
         {user && (
           <div className="px-4 py-4 border-b border-gray-200">
-            <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+            <div className="flex items-center gap-3 p-3 bg-blue-200 rounded-lg">
+              <div className="w-10 h-10 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold">
                 {user.email?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 min-w-0">
@@ -126,8 +126,8 @@ export default function Sidebar() {
                       group flex items-center justify-between p-3 rounded-lg
                       transition-all duration-200 
                       ${active 
-                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105' 
-                        : 'text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:scale-105'
+                        ? 'bg-blue-900 text-white shadow-lg scale-105' 
+                        : 'text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-500 hover:scale-105'
                       }
                     `}
                   >
