@@ -287,21 +287,7 @@ export default function InvoiceListPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full border-2 border-gray-300 bg-white rounded-lg p-3 sm:p-4 pl-12 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 transition-all duration-200 outline-none text-gray-800 font-medium placeholder-gray-400 text-sm sm:text-base shadow-sm"
             />
-            <svg
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+           
           </div>
 
           {/* Status Filter Buttons */}
@@ -491,9 +477,6 @@ export default function InvoiceListPage() {
                           ) : (
                             <Download size={16} />
                           )}
-                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            Download PDF
-                          </span>
                         </button>
 
                         {/* Mark as Paid Button */}
@@ -509,9 +492,7 @@ export default function InvoiceListPage() {
                             ) : (
                               <Check size={16} />
                             )}
-                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                              Mark as Paid
-                            </span>
+                          
                           </button>
                         )}
 
@@ -521,9 +502,7 @@ export default function InvoiceListPage() {
                           title="View Details"
                         >
                           <Eye size={16} />
-                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            View Details
-                          </span>
+                        
                         </button>
 
                         <button
@@ -535,9 +514,7 @@ export default function InvoiceListPage() {
                           title="Delete Invoice"
                         >
                           <Trash2 size={16} />
-                          <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                            Delete
-                          </span>
+                         
                         </button>
                       </div>
                     </div>
