@@ -8,7 +8,6 @@ import {
   FileText, 
   Users, 
   Briefcase, 
-  Settings, 
   Menu, 
   X, 
   LogOut,
@@ -23,7 +22,6 @@ const navLinks = [
   { name: "Clients", href: "/dashboard/clients", icon: Users },
   { name: "Business Profile", href: "/dashboard/business", icon: Briefcase },
   { name: "Profile", href: "/dashboard", icon: User },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
