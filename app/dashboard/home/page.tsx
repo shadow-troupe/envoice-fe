@@ -280,11 +280,11 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 animate-fade-in">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 sm:p-3 rounded-xl shadow-lg">
+            <div className="bg-blue-900 p-2.5 sm:p-3 rounded-xl shadow-lg">
               <BarChart3 className="text-white" size={24} />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
                 Dashboard
               </h1>
               <p className="text-gray-600 text-xs sm:text-sm mt-1">
@@ -305,9 +305,9 @@ export default function DashboardPage() {
           <StatCard
             title="Total Invoices"
             value={stats.totalInvoices}
-            icon={<FileText className="text-indigo-600" size={20} />}
-            gradient="bg-gradient-to-r from-indigo-500 to-indigo-600"
-            iconBg="bg-indigo-50"
+            icon={<FileText className="text-blue-600" size={20} />}
+            gradient="bg-gradient-to-r from-blue-500 to-blue-600"
+            iconBg="bg-blue-200"
             trendLabel="All time"
           />
 
@@ -348,14 +348,14 @@ export default function DashboardPage() {
           {/* Total Revenue */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 p-4 sm:p-6 transform transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-2.5 sm:p-3 rounded-xl">
-                <DollarSign className="text-purple-600" size={20} />
+              <div className="bg-blue-900 p-2.5 sm:p-3 rounded-xl">
+                <DollarSign className="text-white-600" size={20} />
               </div>
             </div>
             <h3 className="text-gray-600 text-xs sm:text-sm font-medium mb-1">
               Total Revenue
             </h3>
-            <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <p className="text-2xl sm:text-3xl font-bold bg-blue-900 bg-clip-text text-transparent">
               {formatCurrency(stats.totalRevenue)}
             </p>
             <div className="mt-3 sm:mt-4 space-y-2">
@@ -397,7 +397,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Completion Rate */}
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 text-white transform transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in md:col-span-2 lg:col-span-1">
+          <div className="bg-blue-900 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 text-white transform transition-all duration-300 hover:shadow-xl hover:scale-105 animate-fade-in md:col-span-2 lg:col-span-1">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className="bg-white/20 backdrop-blur-sm p-2.5 sm:p-3 rounded-xl">
                 <TrendingUp className="text-white" size={20} />
@@ -423,7 +423,7 @@ export default function DashboardPage() {
 
         {/* Recent Invoices - Mobile Optimized */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-fade-in mb-6 sm:mb-8">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 sm:p-6">
+          <div className="bg-blue-900 p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3">
               <Calendar className="text-white" size={20} />
               <h2 className="text-lg sm:text-xl font-bold text-white">
@@ -607,7 +607,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
           <a
             href="/dashboard/invoices/create"
-            className="group bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-105 flex items-center justify-between"
+            className="group  bg-blue-900 text-white p-4 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-105 flex items-center justify-between"
           >
             <div className="flex-1 pr-4">
               <h3 className="text-base sm:text-lg font-bold mb-1">

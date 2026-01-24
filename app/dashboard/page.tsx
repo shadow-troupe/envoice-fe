@@ -239,7 +239,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 flex items-center justify-center p-4">
         <div className="text-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4 sm:mb-6"></div>
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4 sm:mb-6"></div>
           <p className="text-lg sm:text-xl text-gray-700 font-semibold">
             {authLoading ? 'Restoring session...' : 'Loading profile...'}
           </p>
@@ -285,11 +285,11 @@ export default function ProfilePage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6 lg:mb-8 animate-fade-in">
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="bg-gradient-to-r from-purple-600 to-fuchsia-600 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg">
+            <div className="bg-blue-900 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg">
               <User className="text-white" size={24} />
             </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
                 My Profile
               </h1>
               <p className="text-gray-600 text-xs sm:text-sm mt-0.5 sm:mt-1">Manage your account information</p>
@@ -299,7 +299,7 @@ export default function ProfilePage() {
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="self-start sm:self-auto bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:from-purple-600 hover:to-fuchsia-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold flex items-center gap-2 text-sm sm:text-base whitespace-nowrap"
+              className="self-start sm:self-auto bg-blue-900 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:from-purple-600 hover:to-fuchsia-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold flex items-center gap-2 text-sm sm:text-base whitespace-nowrap"
             >
               <Edit2 size={16} />
               <span>Edit Profile</span>
@@ -321,15 +321,15 @@ export default function ProfilePage() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-purple-200 to-fuchsia-200 flex items-center justify-center">
-                      <User className="text-purple-600" size={48} />
+                    <div className="w-full h-full bg-blue-300  flex items-center justify-center">
+                      <User className="text-blue-600" size={48} />
                     </div>
                   )}
                 </div>
                 {editing && (
                   <label
                     htmlFor="profile-image"
-                    className="absolute bottom-0 right-0 bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white p-2.5 sm:p-3 rounded-full cursor-pointer hover:from-purple-600 hover:to-fuchsia-700 transform transition-all duration-200 hover:scale-110 shadow-lg"
+                    className="absolute bottom-0 right-0 bg-blue-900 text-white p-2.5 sm:p-3 rounded-full cursor-pointer hover:from-blue-300 hover:to-blue-700 transform transition-all duration-200 hover:scale-110 shadow-lg"
                   >
                     <Camera size={16} />
                     <input
@@ -348,7 +348,7 @@ export default function ProfilePage() {
                   ? `${user.first_name} ${user.last_name}`
                   : user?.username || "User"}
               </h2>
-              <p className="text-sm sm:text-base text-purple-600 font-medium mb-3 sm:mb-4">@{user?.username || "username"}</p>
+              <p className="text-sm sm:text-base text-blue-600 font-medium mb-3 sm:mb-4">@{user?.username || "username"}</p>
               
               {/* Status Badge */}
               <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
@@ -397,7 +397,7 @@ export default function ProfilePage() {
           {/* Profile Information Card */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl border border-gray-100 overflow-hidden animate-scale-in">
-              <div className="bg-gradient-to-r from-purple-600 to-fuchsia-600 p-4 sm:p-6">
+              <div className="bg-blue-900  p-4 sm:p-6">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Profile Information</h2>
               </div>
 
@@ -410,14 +410,14 @@ export default function ProfilePage() {
                       <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5 sm:mb-2">First Name</label>
                       <div className="relative">
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                          <User className="text-purple-600" size={16} />
+                          <User className="text-blue-600" size={16} />
                         </div>
                         <input
                           type="text"
                           value={form.first_name}
                           onChange={(e) => setForm({ ...form, first_name: e.target.value })}
                           placeholder="Enter first name"
-                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-9 sm:pl-10 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
+                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-9 sm:pl-10 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
                         />
                       </div>
                     </div>
@@ -427,14 +427,14 @@ export default function ProfilePage() {
                       <label className="block text-xs sm:text-sm font-bold text-gray-800 mb-1.5 sm:mb-2">Last Name</label>
                       <div className="relative">
                         <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                          <User className="text-purple-600" size={16} />
+                          <User className="text-blue-600" size={16} />
                         </div>
                         <input
                           type="text"
                           value={form.last_name}
                           onChange={(e) => setForm({ ...form, last_name: e.target.value })}
                           placeholder="Enter last name"
-                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-9 sm:pl-10 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
+                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-9 sm:pl-10 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
                         />
                       </div>
                     </div>
@@ -451,7 +451,7 @@ export default function ProfilePage() {
                           value={form.username}
                           onChange={(e) => setForm({ ...form, username: e.target.value })}
                           placeholder="username"
-                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-8 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
+                          className="w-full border-2 border-gray-300 bg-white rounded-lg p-2.5 sm:p-3 pl-8 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 outline-none text-gray-900 font-medium placeholder-gray-400 text-sm"
                         />
                       </div>
                     </div>
@@ -586,9 +586,9 @@ export default function ProfilePage() {
                     )}
 
                     {user?.country && (
-                      <div className="p-3 sm:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                      <div className="p-3 sm:p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-blue-200">
                         <div className="flex items-center gap-2">
-                          <Globe className="text-indigo-600 flex-shrink-0" size={16} />
+                          <Globe className="text-blue-600 flex-shrink-0" size={16} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Country</p>
                             <p className="text-sm sm:text-base text-gray-900 font-semibold truncate">{user.country}</p>
@@ -604,7 +604,7 @@ export default function ProfilePage() {
                       <p className="text-sm sm:text-base text-gray-500 mb-3 sm:mb-4 px-4">Complete your profile to get the most out of your account</p>
                       <button
                         onClick={() => setEditing(true)}
-                        className="bg-gradient-to-r from-purple-500 to-fuchsia-600 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:from-purple-600 hover:to-fuchsia-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold text-sm sm:text-base"
+                        className="bg-blue-900 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:from-blue-300 hover:to-blue-700 transform transition-all duration-200 hover:scale-105 shadow-md font-semibold text-sm sm:text-base"
                       >
                         Complete Profile
                       </button>
