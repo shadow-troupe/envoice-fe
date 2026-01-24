@@ -23,16 +23,15 @@ export default function ContactPage() {
       icon: <Mail className="text-indigo-600" size={32} />,
       title: "Email Us",
       description: "Our team will respond within 24 hours",
-      contact: "support@envoice.com",
-      link: "mailto:support@envoice.com",
+      contact: "support@envoice.site",
+      link: "mailto:support@envoice.site",
       gradient: "from-indigo-500 to-purple-600",
     },
     {
       icon: <Phone className="text-green-600" size={32} />,
       title: "Call Us",
       description: "Mon-Fri from 9am to 6pm EST",
-      contact: "+1 (555) 123-4567",
-      link: "tel:+15551234567",
+   
       gradient: "from-green-500 to-emerald-600",
     },
     {
