@@ -41,7 +41,6 @@ export default function SignupPage() {
   const router = useRouter();
 
   const onSubmit = async (data: SignupFormData) => {
-
     const res = await fetch(`${base_url}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -94,14 +93,16 @@ export default function SignupPage() {
                 <input
                   {...register("username")}
                   placeholder="Username"
-                  className="w-full  px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl 
+    text-gray-900 placeholder-gray-500
+    focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
                 {/* Email */}
                 <input
                   {...register("email")}
                   placeholder="Email"
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
                 {/* Password */}
@@ -110,7 +111,7 @@ export default function SignupPage() {
                     type={showPassword ? "text" : "password"}
                     {...register("password")}
                     placeholder="Password"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-blue-100 outline-none"
                   />
                   <button
                     type="button"
@@ -184,7 +185,7 @@ export default function SignupPage() {
                     <Check size={16} />
                     {item}
                   </div>
-                )
+                ),
               )}
             </div>
           </div>
