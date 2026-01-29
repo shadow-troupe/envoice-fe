@@ -64,9 +64,9 @@ export default function SignupPage() {
           <div>
             <Link href="/" className="lg:hidden flex items-center gap-3 mb-6">
               <div className="bg-blue-900 p-2.5 rounded-xl">
-                <FileText className="text-white" size={24} />
+                <FileText className="text-white" size={32} />
               </div>
-              <h1 className="text-2xl font-bold text-blue-900">Envoice</h1>
+              <h1 className="text-3xl font-bold text-blue-900">Envoice</h1>
             </Link>
 
             <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
@@ -94,7 +94,7 @@ export default function SignupPage() {
                 <input
                   {...register("username")}
                   placeholder="Username"
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
+                  className="w-full  px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-blue-900 focus:ring-4 focus:ring-blue-100 outline-none"
                 />
 
                 {/* Email */}
