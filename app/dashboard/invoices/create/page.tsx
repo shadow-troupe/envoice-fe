@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Plus, X, ArrowLeft, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "../../../context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -24,7 +24,8 @@ interface Client {
   address: string;
 }
 
-export default function CreateInvoicePage() {
+// ✅ Separate component that uses useSearchParams
+function CreateInvoiceForm() {
   const CURRENCIES = [
     { code: "NGN", label: "NGN - Naira" },
     { code: "USD", label: "USD - Dollar" },
@@ -38,7 +39,6 @@ export default function CreateInvoicePage() {
   const [submitting, setSubmitting] = useState(false);
   const [client, setClient] = useState<Client | null>(null);
 
-  // ✅ Modal states
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -115,7 +115,6 @@ export default function CreateInvoicePage() {
       if (res.ok) {
         setSubmitting(false);
         setShowSuccessModal(true);
-        // Redirect after 2 seconds
         setTimeout(() => {
           router.push("/dashboard/invoices");
         }, 2000);
@@ -191,7 +190,7 @@ export default function CreateInvoicePage() {
             <ArrowLeft size={24} className="text-gray-700" />
           </button>
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold  bg-blue-900 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-blue-900 bg-clip-text text-transparent">
               Create Invoice
             </h1>
             <p className="text-gray-600 text-sm mt-1">
@@ -243,9 +242,7 @@ export default function CreateInvoicePage() {
                   onChange={(e) =>
                     setForm({ ...form, currency: e.target.value })
                   }
-                  className="w-full border-2 border-blue-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3
-      focus:border-blue-500 focus:ring-4 focus:ring-blue-200 focus:bg-white
-      transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
+                  className="w-full border-2 border-blue-300 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
                   required
                 >
                   {CURRENCIES.map((currency) => (
@@ -255,6 +252,7 @@ export default function CreateInvoicePage() {
                   ))}
                 </select>
               </div>
+
               {/* Issue Date */}
               <div className="relative">
                 <label className="block text-sm font-semibold text-blue-700 mb-1">
@@ -325,15 +323,14 @@ export default function CreateInvoicePage() {
                   Discount Type
                 </label>
                 <select
-                className="w-full border-2 border-amber-300 bg-gradient-to-r from-amber-50 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2 sm:p-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
-                  value={form.discountType || ""} // because null → "", which matches <option value="">
+                  className="w-full border-2 border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2 sm:p-3 focus:border-amber-500 focus:ring-4 focus:ring-amber-200 focus:bg-white transition-all duration-200 outline-none font-medium text-gray-800 appearance-none cursor-pointer text-sm sm:text-base"
+                  value={form.discountType || ""}
                   onChange={(e) => {
                     const val = e.target.value;
                     const newType =
                       val === "" ? null : (val as "PERCENTAGE" | "FIXED");
                     setForm({ ...form, discountType: newType });
                   }}
-                  // ...rest
                 >
                   <option value="">No Discount</option>
                   <option value="PERCENTAGE">Percentage Discount</option>
@@ -406,7 +403,7 @@ export default function CreateInvoicePage() {
                             Qty
                           </label>
                           <input
-                            type="text"
+                            type="number"
                             placeholder="Qty"
                             value={item.quantity}
                             onChange={(e) =>
@@ -421,7 +418,7 @@ export default function CreateInvoicePage() {
                             Price
                           </label>
                           <input
-                            type="text"
+                            type="number"
                             placeholder="Price"
                             value={item.unitPrice}
                             onChange={(e) =>
@@ -436,7 +433,7 @@ export default function CreateInvoicePage() {
                             Disc
                           </label>
                           <input
-                            type="text"
+                            type="number"
                             placeholder="Disc."
                             value={item.discount || 0}
                             onChange={(e) =>
@@ -477,7 +474,7 @@ export default function CreateInvoicePage() {
                           Quantity
                         </label>
                         <input
-                          type="text"
+                          type="number"
                           placeholder="Qty"
                           value={item.quantity}
                           onChange={(e) =>
@@ -492,7 +489,7 @@ export default function CreateInvoicePage() {
                           Unit Price
                         </label>
                         <input
-                          type="text"
+                          type="number"
                           placeholder="Price"
                           value={item.unitPrice}
                           onChange={(e) =>
@@ -621,5 +618,25 @@ export default function CreateInvoicePage() {
         </>
       )}
     </div>
+  );
+}
+
+// ✅ Main component wrapped with Suspense
+export default function CreateInvoicePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg text-gray-700 font-medium">
+              Loading invoice form...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <CreateInvoiceForm />
+    </Suspense>
   );
 }

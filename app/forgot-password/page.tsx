@@ -1,12 +1,15 @@
 // app/auth/change-password/page.tsx
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 
-const base_url = process.env.NEXT_PUBLIC_API_BASE_URL
-export default function ChangePasswordPage() {
+const base_url = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// ✅ Separate component that uses useSearchParams
+function ChangePasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
@@ -118,5 +121,23 @@ export default function ChangePasswordPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+// ✅ Main component with Suspense wrapper
+export default function ChangePasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+          <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 w-full max-w-md text-center">
+            <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-lg text-gray-700 font-medium">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <ChangePasswordForm />
+    </Suspense>
   );
 }
